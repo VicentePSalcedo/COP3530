@@ -22,38 +22,59 @@ class Node234
 	private Node234 childArray[] = new Node234[ORDER]; //each node can have up to 4 (=K) child nodes
 	private DataItem itemArray[] = new DataItem[ORDER-1]; //each node can contain up to 3 (=K-1) keys
 	// -------------------------------------------------------------
-	
-	public Node234 getChild(int childNum)
-	{ return childArray[childNum]; }
+	public void setNumItems(int numItems) {
+		this.numItems = numItems;
+	}
+
+	public void setParent(Node234 parent) {
+		this.parent = parent;
+	}
+
+	public void setChildArray(Node234[] childArray) {
+		this.childArray = childArray;
+	}
+
+	public void setItemArray(DataItem[] itemArray) {
+		this.itemArray = itemArray;
+	}
+
+	public Node234 getChild(int childNum){
+		return childArray[childNum];
+	}
 	// -------------------------------------------------------------
 	
-	public Node234 getParent()
-	{ return parent; }
+	public Node234 getParent(){
+		return parent;
+	}
 	// -------------------------------------------------------------
 	
-	public boolean isLeaf()
-	{ return (childArray[0]==null) ? true : false; }
+	public boolean isLeaf(){ 
+		return (childArray[0]==null) ? true : false;
+	}
 	// -------------------------------------------------------------
 	
-	public int getNumItems()
-	{ return numItems; }
+	public int getNumItems(){
+		return numItems;
+	}
 	// -------------------------------------------------------------
 	
-	public DataItem getItem(int index)   // get DataItem at index
-	{ return itemArray[index]; }
+	public DataItem getItem(int index){   // get DataItem at index
+		return itemArray[index];
+	}
 	// -------------------------------------------------------------
 	
-	public boolean isFull()
-	{ return (numItems==ORDER-1) ? true : false; }
+	public boolean isFull(){
+		return (numItems==ORDER-1) ? true : false;
+	}
 	// -------------------------------------------------------------
 	
-	public void displayNode()           // format "/24/56/74/"
-	{
+	public void displayNode(){           // format "/24/56/74/"
 		for(int j=0; j<numItems; j++)
 		itemArray[j].displayItem();   // "/56" 
 		System.out.println("/");         // final "/"
 	}
 	// -------------------------------------------------------------
+
 }  // end class Node234 ////////////////////////////////////////////////////////////////
 
 class Tree234 {
@@ -62,8 +83,7 @@ class Tree234 {
 	// -------------------------------------------------------------
 	
 	// search for a key
-	public Node234 search(long key)
-	{	
+	public Node234 search(long key){	
 		Node234 currNode234 = root;
 		while (currNode234.getNumItems() != 0){
 			if (key == currNode234.getItem(0).dData || key == currNode234.getItem(1).dData || key == currNode234.getItem(2).dData){
@@ -84,20 +104,35 @@ class Tree234 {
 	// -------------------------------------------------------------
 	
 	// insert a DataItem
-	public void insert(long dValue)
-	{
-		Node234 curNode = root;
+	public void insert(Node234 node, long dValue){
 		int index = 0;
-		while(index < curNode.getNumItems()){
-			if(dValue == curNode.getItem(index).dData){
+		while(index < node.getNumItems()){
+			if(dValue == node.getItem(index).dData){
 				return;
 			}
 			index++;
 		}
-		if (curNode.isFull()){
-			curNode
+		if(node.isFull()){
+			node = split(node, node.getParent());
 		}
-	}  // end insert()
+		if(!node.isLeaf()){
+			if(dValue < node.getItem(0).dData){
+				insert(node.getChild(0), dValue);
+			} else if(node.getItem(1) == null || dValue < node.getItem(1).dData){
+				insert(node.getChild(1), dValue);
+			} else if(node.getChild(2) == null || dValue < node.getItem(2).dData){
+				insert(node.getChild(2), dValue);
+			} else {
+				insert(node.getChild(3), dValue);
+			}
+		} else {
+			insertIntoLeaf(node, dValue);
+		}
+	}  
+	public Node234 split(Node234 node, Node234 nodeParent){
+		return null;
+	}
+	// end insert()
 	// -------------------------------------------------------------
 	
 	public void displayTree()
@@ -124,6 +159,11 @@ class Tree234 {
 		}
 	}  // end recDisplayTree()
 	// -------------------------------------------------------------
+
+	public Node234 getRoot() {
+		return root;
+	}
+
 }  // end class Tree234 ////////////////////////////////////////////////////////////////
 	
 		
@@ -143,7 +183,7 @@ public class Tree234App{
 			data = Long.parseLong(line.split(" ")[1]); 
 
 			if (task.equals("i")) { //insert
-				tree.insert(data); 
+				tree.insert(tree.getRoot(), data); 
 				System.out.println("Inserting "+data+": complete."); 
 				tree.displayTree(); 
 			} 
@@ -163,20 +203,4 @@ public class Tree234App{
 		tree.displayTree();
 	}
 
-	public void BTreeSplit(tree, node, nodeParent) {
-		if (node is not full) {
-		   return null
-		}
-	 
-		splitLeft = new BTreeNode(node⇢A, node⇢left, node⇢middle1)
-		splitRight = new BTreeNode(node⇢C, node⇢middle2, node⇢right)
-		if (nodeParent is not null) {
-		   BTreeInsertKeyWithChildren(nodeParent, node⇢B, splitLeft, splitRight)
-		}
-		else {
-		   nodeParent = new BTreeNode(node⇢B, splitLeft, splitRight)
-		   tree⇢root = nodeParent
-		}
-		return nodeParent
-	 }
 }
