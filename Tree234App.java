@@ -86,7 +86,17 @@ class Tree234 {
 	// insert a DataItem
 	public void insert(long dValue)
 	{
-		
+		Node234 curNode = root;
+		int index = 0;
+		while(index < curNode.getNumItems()){
+			if(dValue == curNode.getItem(index).dData){
+				return;
+			}
+			index++;
+		}
+		if (curNode.isFull()){
+			curNode
+		}
 	}  // end insert()
 	// -------------------------------------------------------------
 	
@@ -152,4 +162,21 @@ public class Tree234App{
 		System.out.println("--- Final Tree ---");
 		tree.displayTree();
 	}
+
+	public void BTreeSplit(tree, node, nodeParent) {
+		if (node is not full) {
+		   return null
+		}
+	 
+		splitLeft = new BTreeNode(node⇢A, node⇢left, node⇢middle1)
+		splitRight = new BTreeNode(node⇢C, node⇢middle2, node⇢right)
+		if (nodeParent is not null) {
+		   BTreeInsertKeyWithChildren(nodeParent, node⇢B, splitLeft, splitRight)
+		}
+		else {
+		   nodeParent = new BTreeNode(node⇢B, splitLeft, splitRight)
+		   tree⇢root = nodeParent
+		}
+		return nodeParent
+	 }
 }
