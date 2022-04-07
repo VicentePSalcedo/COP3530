@@ -17,7 +17,7 @@ class DataItem
 class Node234
 {
 	private static final int ORDER = 4; //order of 2-3-4 Tree is 4 (i.e. K=4)
-	private int numItems; // # of items in the node
+	private int numItems = 0; // # of items in the node
 	private Node234 parent;
 	private Node234 childArray[] = new Node234[ORDER]; //each node can have up to 4 (=K) child nodes
 	private DataItem itemArray[] = new DataItem[ORDER-1]; //each node can contain up to 3 (=K-1) keys
@@ -30,12 +30,12 @@ class Node234
 		this.parent = parent;
 	}
 
-	public void setChildArray(Node234[] childArray) {
-		this.childArray = childArray;
+	public void setChildArray(int index, Node234 child) {
+		this.childArray[index] = child;
 	}
 
-	public void setItemArray(DataItem[] itemArray) {
-		this.itemArray = itemArray;
+	public void setItemArray(int index, DataItem item) {
+		this.itemArray[index] = item;
 	}
 
 	public Node234 getChild(int childNum){
@@ -75,6 +75,10 @@ class Node234
 	}
 	// -------------------------------------------------------------
 
+	public static int getOrder() {
+		return ORDER;
+	}
+
 }  // end class Node234 ////////////////////////////////////////////////////////////////
 
 class Tree234 {
@@ -104,8 +108,33 @@ class Tree234 {
 	// -------------------------------------------------------------
 	
 	// insert a DataItem
+	public void insertIntoLeaf(Node234 node, long key){
+		int index = 0;
+		DataItem keyItem = new DataItem(key);
+		while(index < node.getNumItems()){
+			if(key == node.getItem(index).dData){
+				return;
+			}
+			index++;
+		}
+		if(key < node.getItem(0).dData){
+			node.setItemArray(2, node.getItem(1));
+			node.setItemArray(1, node.getItem(0));
+			node.setItemArray(0, keyItem);
+		} else if (node.getItem(1) == null || key < node.getItem(1).dData){
+			node.setItemArray(2, node.getItem(1));
+			node.setItemArray(1, keyItem);
+		} else {
+			node.setItemArray(2, keyItem);
+		}
+	}
+
 	public void insert(Node234 node, long dValue){
 		int index = 0;
+		DataItem dValueItem = new DataItem(dValue);
+		if(node.getNumItems() == 0){
+			node.setItemArray(0, dValueItem);
+		}
 		while(index < node.getNumItems()){
 			if(dValue == node.getItem(index).dData){
 				return;
@@ -129,8 +158,51 @@ class Tree234 {
 			insertIntoLeaf(node, dValue);
 		}
 	}  
+
 	public Node234 split(Node234 node, Node234 nodeParent){
-		return null;
+		if(!node.isFull()){
+			return null;
+		}
+		Node234 splitLeft = new Node234();
+		splitLeft.setItemArray(0, node.getItem(0));
+		splitLeft.setChildArray(0, node.getChild(0));
+		splitLeft.setChildArray(1, node.getChild(1));
+		Node234 splitRight = new Node234();
+		splitRight.setItemArray(0, node.getItem(2));
+		splitRight.setChildArray(0, node.getChild(2));
+		splitRight.setChildArray(1, node.getChild(3));
+		if(!nodeParent.isFull()){
+			insertKeyWithChildren(nodeParent, node.getItem(1), splitLeft, splitRight);
+		} else {
+			nodeParent = new Node234();
+			nodeParent.setItemArray(0, node.getItem(1));
+			nodeParent.setChildArray(0, splitLeft);
+			nodeParent.setChildArray(1, splitRight);
+			root = nodeParent;
+		}
+		return nodeParent;
+	}
+
+	public void insertKeyWithChildren(Node234 parent, DataItem key, Node234 leftChild, Node234 rightChild){
+		if(key.dData < parent.getItem(0).dData){
+			parent.setItemArray(2, parent.getItem(1));
+			parent.setItemArray(1, parent.getItem(0));
+			parent.setItemArray(0, key);
+			parent.setChildArray(3, parent.getChild(2));
+			parent.setChildArray(2, parent.getChild(1));
+			parent.setChildArray(1, rightChild);
+			parent.setChildArray(0, leftChild);
+		} else if (parent.getItem(1) == null || key.dData < parent.getItem(1).dData){
+			parent.setItemArray(2, parent.getItem(1));
+			parent.setItemArray(1, key);
+			parent.setChildArray(3, parent.getChild(2));
+			parent.setChildArray(2, rightChild);
+			parent.setChildArray(1, leftChild);
+		} else {
+			parent.setItemArray(2, key);
+			parent.setChildArray(3, rightChild);
+			parent.setChildArray(2, leftChild);
+		}
 	}
 	// end insert()
 	// -------------------------------------------------------------
